@@ -1,121 +1,95 @@
 #!/bin/sh
 
 # Directory to store tags
-TAGS_DIR="$HOME/.tags"
+TAGS_DIR=${TAGS_DIR:-$HOME/.tags}
 
-create_tags_dir() {
-	if [ ! -d "$TAGS_DIR" ]; then
-		mkdir -p "$TAGS_DIR"
-	fi
-}
+die() { echo "$*" >&2; exit 1; }
 
 add_tag() {
-	tag_name="$1"
-	file="$2"
+	tag_name=$1
+	file=$2
+	tag_dir=$TAGS_DIR/$tag_name
+	tag_file_basename=$(basename "$file")
 
-	if [ ! -f "$file" ]; then
-		echo "Error: File '$file' does not exist." >&2
-		exit 1
-	fi
+	[ ! -f "$file" ] && die "Error: File '$file' does not exist."
 
-	create_tags_dir
-	tag_dir="$TAGS_DIR/$tag_name"
-	if [ ! -d "$tag_dir" ]; then
-		mkdir -p "$tag_dir"
-	fi
+	mkdir -p "$TAGS_DIR"
+	mkdir -p "$tag_dir"
 
-	if [ -f "$tag_dir/$(basename "$file")" ]; then
-		echo "Error: File '$file' is already tagged with '$tag_name'." >&2
-		exit 1
-	fi
+	[ -f "$tag_dir/tag_file_basename" ] &&
+		die "Error: File '$file' is already tagged with '$tag_name'."
 
-	ln "$file" "$tag_dir/$(basename "$file")"
+	ln "$file" "$tag_dir/tag_file_basename"
 	echo "Tagged '$file' with '$tag_name'"
 }
 
 list_tag() {
-	tag_name="$1"
-	tag_dir="$TAGS_DIR/$tag_name"
-
-	if [ ! -d "$tag_dir" ]; then
-		echo "Tag '$tag_name' does not exist." >&2
-		exit 1
-	fi
-
+	tag_name=$1
+	tag_dir=$TAGS_DIR/$tag_name
+	[ ! -d "$tag_dir" ] && die "Tag '$tag_name' does not exist."
 	ls -1 "$tag_dir" | awk 'NF'
 }
 
 rm_tag() {
-	tag_name="$1"
-	file="$2"
-	tag_dir="$TAGS_DIR/$tag_name"
+	tag_name=$1
+	file=$2
+	tag_dir=$TAGS_DIR/$tag_name
+	tag_file_basename=$(basename "$file")
 
-	if [ ! -d "$tag_dir" ]; then
-		echo "Tag '$tag_name' does not exist." >&2
-		exit 1
-	fi
+	[ ! -d "$tag_dir" ] && die "Tag '$tag_name' does not exist."
+	[ ! -f "$tag_dir/tag_file_basename" ] &&
+		die "Error: File '$file' is not tagged with '$tag_name'."
 
-	if [ ! -f "$tag_dir/$(basename "$file")" ]; then
-		echo "Error: File '$file' is not tagged with '$tag_name'." >&2
-		exit 1
-	fi
-
-	rm "$tag_dir/$(basename "$file")"
+	rm "$tag_dir/tag_file_basename"
 	echo "Removed tag '$tag_name' from '$file'"
 }
 
 get_tag() {
-	tag_name="$1"
-	file="$2"
-	tag_dir="$TAGS_DIR/$tag_name"
+	tag_name=$1
+	file=$2
+	tag_dir=$TAGS_DIR/$tag_name
+	tag_file_basename=$(basename "$file")
 
-	if [ ! -d "$tag_dir" ]; then
-		echo "Tag '$tag_name' does not exist." >&2
-		exit 1
-	fi
+	[ ! -d "$tag_dir" ] && die "Tag '$tag_name' does not exist."
+	[ ! -f "$tag_dir/tag_file_basename" ] &&
+		die "Error: File '$file' is not tagged with '$tag_name'."
 
-	if [ ! -f "$tag_dir/$(basename "$file")" ]; then
-		echo "Error: File '$file' is not tagged with '$tag_name'." >&2
-		exit 1
-	fi
-
-	echo "$tag_dir/$(basename "$file")"
+	echo "$tag_dir/tag_file_basename"
 }
 
-case "$1" in
+case $1 in
 add)
 	if [ -z "$2" ] || [ -z "$3" ]; then
-		echo "Usage: $0 add <TAG_NAME> <FILE>" >&2
-		exit 1
+		die "Usage: $0 add <TAG_NAME> <FILE>"
 	fi
 	add_tag "$2" "$3"
 	;;
 list)
 	if [ -z "$2" ]; then
-		echo "Usage: $0 list <TAG_NAME>" >&2
-		exit 1
+		die "Usage: $0 list <TAG_NAME>"
 	fi
 	list_tag "$2"
 	;;
 rm)
 	if [ -z "$2" ] || [ -z "$3" ]; then
-		echo "Usage: $0 rm <TAG_NAME> <FILE>" >&2
-		exit 1
+		die "Usage: $0 rm <TAG_NAME> <FILE>"
 	fi
 	rm_tag "$2" "$3"
 	;;
 get)
 	if [ -z "$2" ] || [ -z "$3" ]; then
-		echo "Usage: $0 get <TAG_NAME> <FILE>" >&2
-		exit 1
+		die "Usage: $0 get <TAG_NAME> <FILE>"
 	fi
 	get_tag "$2" "$3"
 	;;
 *)
-	echo "Usage: $0 add <TAG_NAME> <FILE>" >&2
-	echo "       $0 list <TAG_NAME>" >&2
-	echo "       $0 rm <TAG_NAME> <FILE>" >&2
-	echo "       $0 get <TAG_NAME> <FILE>" >&2
+	progname=$(basename "$0")
+	{
+		echo "Usage: $progname add <TAG_NAME> <FILE>"
+		echo "       $progname list <TAG_NAME>"
+		echo "       $progname rm <TAG_NAME> <FILE>"
+		echo "       $progname get <TAG_NAME> <FILE>"
+	} >&2
 	exit 1
 	;;
 esac
