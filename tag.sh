@@ -16,10 +16,10 @@ add_tag() {
 	mkdir -p "$TAGS_DIR"
 	mkdir -p "$tag_dir"
 
-	[ -f "$tag_dir/tag_file_basename" ] &&
+	[ -f "$tag_dir/$tag_file_basename" ] &&
 		die "Error: File '$file' is already tagged with '$tag_name'."
 
-	ln "$file" "$tag_dir/tag_file_basename"
+	ln "$file" "$tag_dir/$tag_file_basename"
 	echo "Tagged '$file' with '$tag_name'"
 }
 
@@ -37,10 +37,10 @@ rm_tag() {
 	tag_file_basename=$(basename "$file")
 
 	[ ! -d "$tag_dir" ] && die "Tag '$tag_name' does not exist."
-	[ ! -f "$tag_dir/tag_file_basename" ] &&
+	[ ! -f "$tag_dir/$tag_file_basename" ] &&
 		die "Error: File '$file' is not tagged with '$tag_name'."
 
-	rm "$tag_dir/tag_file_basename"
+	rm "$tag_dir/$tag_file_basename"
 	echo "Removed tag '$tag_name' from '$file'"
 }
 
@@ -51,10 +51,10 @@ get_tag() {
 	tag_file_basename=$(basename "$file")
 
 	[ ! -d "$tag_dir" ] && die "Tag '$tag_name' does not exist."
-	[ ! -f "$tag_dir/tag_file_basename" ] &&
+	[ ! -f "$tag_dir/$tag_file_basename" ] &&
 		die "Error: File '$file' is not tagged with '$tag_name'."
 
-	echo "$tag_dir/tag_file_basename"
+	echo "$tag_dir/$tag_file_basename"
 }
 
 case $1 in
