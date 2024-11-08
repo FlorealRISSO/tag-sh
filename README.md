@@ -68,13 +68,13 @@ This command lists all files that are tagged with `work`.
 To remove a tag from a file, use the following command:
 
 ```sh
-./tag.sh rm <TAG_NAME> <VOLUME> <FILE>
+./tag.sh rm <TAG_NAME> <VOLUME> <FILE_BASENAME>
 ```
 
 **Example:**
 
 ```sh
-./tag.sh rm work /media/usb1/project.txt
+./tag.sh rm work /media/usb1 project.txt
 ```
 
 This command removes the tag `work` from the file `project.txt` located on the specified volume.
@@ -84,13 +84,13 @@ This command removes the tag `work` from the file `project.txt` located on the s
 To get the path of a file associated with a tag, use the following command:
 
 ```sh
-./tag.sh get <TAG_NAME> <VOLUME> <FILE>
+./tag.sh get <TAG_NAME> <VOLUME> <FILE_BASENAME>
 ```
 
 **Example:**
 
 ```sh
-./tag.sh get work /media/usb1/project.txt
+./tag.sh get work /media/usb1 project.txt
 ```
 
 This command prints the path to `project.txt`, which would be something like `$HOME/.tags/work/project.txt`.

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Directory to store tags
-TAGS_DIRS="$HOME"
+TAGS_DIRS=${TAGS_DIRS:-$HOME}
 TAGS_DIR=".tags"
 
 get_mountpoint() {
@@ -116,8 +116,8 @@ get)
 	{
 		echo "Usage: $progname add <TAG_NAME> <FILE>"
 		echo "       $progname list <TAG_NAME>"
-		echo "       $progname rm <TAG_NAME> <VOLUME> <FILE>"
-		echo "       $progname get <TAG_NAME> <VOLUME> <FILE>"
+		echo "       $progname rm <TAG_NAME> <VOLUME> <FILE_BASENAME>"
+		echo "       $progname get <TAG_NAME> <VOLUME> <FILE_BASENAME>"
 	} >&2
 	exit 1
 	;;
